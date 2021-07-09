@@ -2,20 +2,21 @@ import re
 import fontforge as ff
 from glob import glob
 
+# true 为 UI
+fontList = [{True: {"en": "Microsoft YaHei UI", "zh": "微软雅黑 UI"}, False: {"en": "Microsoft YaHei", "zh": "微软雅黑"}}, {True: {"en": "Microsoft JhengHei UI", "zh": "微軟正黑體 UI"}, False: {"en": "Microsoft JhengHei", "zh": "微軟正黑體"}}]
+retList = ["msyh", "msjh"]
 class TTFTask:
-  def __init__(self, font, variant, ui) -> None:
+  def __init__(self, font, variant, ui, index) -> None:
     self.font = font
     self.variant = variant
     self.ui = ui
+    self.index = index
 
   def edit(self):
-    enusr = "Microsoft YaHei"
-    if self.ui:
-      enusr = "Microsoft YaHei UI"
+    font = fontList[self.index]
+    enusr = font[self.ui]["en"]
     enus = enusr + self.variant
-    zhcnr = "微软雅黑"
-    if self.ui:
-      zhcnr = "微软雅黑 UI"
+    zhcnr = font[self.ui]["zh"]
     zhcn = zhcnr + self.variant
     # self.font.fullname = enus
     self.font.fontname = enus.replace(" ", "-")
@@ -42,21 +43,28 @@ class TTCFile:
   def __init__(self, file, variant):
     self.file = file
     self.variant = variant
-    self.output = transformVariant(variant)
+    self.output = transformVariant
 
-  def openTTF(self, isui):
+  def openTTF(self, isui, index):
     target = "Sarasa Gothic CL"
     if isui:
       target = "Sarasa UI CL"
     font = ff.open('%s(%s%s)'%(self.file, target, self.variant))
-    return TTFTask(font, self.variant, isui)
+    return TTFTask(font, self.variant, isui, index)
 
   def build(self):
-    ttf = self.openTTF(False)
+    ttf = self.openTTF(False, 0)
     ttf.edit()
-    ttfui = self.openTTF(True)
+    ttfui = self.openTTF(True, 0)
     ttfui.edit()
-    ttf.font.generateTtc("out/%s"%self.output, ttfui.font, ttcflags = ("merge"), layer = 1)
+    ttf.font.generateTtc("out/%s"%self.output(self.variant, 0), ttfui.font, ttcflags = ("merge"), layer = 1)
+    ttf.font.close()
+    ttfui.font.close()
+    ttf = self.openTTF(False, 1)
+    ttf.edit()
+    ttfui = self.openTTF(True, 1)
+    ttfui.edit()
+    ttf.font.generateTtc("out/%s"%self.output(self.variant, 1), ttfui.font, ttcflags = ("merge"), layer = 1)
     ttf.font.close()
     ttfui.font.close()
   
@@ -69,8 +77,8 @@ def listTtc(pattern):
       if m := re.match(r"Sarasa Gothic CL(.*)?", face):
         yield TTCFile(ttc, m.group(1))
 
-def transformVariant(input):
-  ret = "msyh"
+def transformVariant(input, index):
+  ret = retList[index]
   if "Bold" in input:
     ret += "bd"
   if "Semibold" in input:
