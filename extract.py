@@ -3,8 +3,11 @@ import fontforge as ff
 from glob import glob
 
 # true 为 UI
+# os2_codepages sc (537133471, -1006632960) hc (537919903, -1006632960)
 fontList = [{True: {"en": "Microsoft YaHei UI", "zh": "微软雅黑 UI"}, False: {"en": "Microsoft YaHei", "zh": "微软雅黑"}}, {True: {"en": "Microsoft JhengHei UI", "zh": "微軟正黑體 UI"}, False: {"en": "Microsoft JhengHei", "zh": "微軟正黑體"}}]
 retList = ["msyh", "msjh"]
+os2_codepagesList = [(537133471, -1006632960), (537919903, -1006632960)]
+# index 0 雅黑 1 正黑
 class TTFTask:
   def __init__(self, font, variant, ui, index) -> None:
     self.font = font
@@ -25,6 +28,7 @@ class TTFTask:
     print(self.font.fontname)
     print(self.font.fullname)
     print(self.font.familyname)
+    self.font.os2_codepages = os2_codepagesList[self.index]
     self.font.appendSFNTName("English (US)", "Family", enusr)
     self.font.appendSFNTName("English (US)", "UniqueID", enus)
     self.font.appendSFNTName("English (US)", "Fullname", enus)
