@@ -3,7 +3,7 @@ import fontforge as ff
 from glob import glob
 
 # true 为 UI
-# os2_codepages sc (537133471, -1006632960) hc (537919903, -1006632960)
+# os2_codepages sc (537133471, -1006632960) hc (537919903, -1006632960) 没什么用，给系统识别
 fontList = [{True: {"en": "Microsoft YaHei UI", "zh": "微软雅黑 UI"}, False: {"en": "Microsoft YaHei", "zh": "微软雅黑"}}, {True: {"en": "Microsoft JhengHei UI", "zh": "微軟正黑體 UI"}, False: {"en": "Microsoft JhengHei", "zh": "微軟正黑體"}}]
 retList = ["msyh", "msjh"]
 os2_codepagesList = [(537133471, -1006632960), (537919903, -1006632960)]
@@ -22,7 +22,7 @@ class TTFTask:
     zhcnr = font[self.ui]["zh"]
     zhcn = zhcnr + self.variant
     # self.font.fullname = enus
-    self.font.fontname = enus.replace(" ", "-")
+    self.font.fontname = enus.replace(" ", "")
     self.font.fullname = enus
     self.font.familyname = enusr
     print(self.font.fontname)
@@ -31,6 +31,7 @@ class TTFTask:
     self.font.os2_codepages = os2_codepagesList[self.index]
     self.font.appendSFNTName("English (US)", "Family", enusr)
     self.font.appendSFNTName("English (US)", "UniqueID", enus)
+    self.font.appendSFNTName("English (US)", "PostScriptName", enus.replace(" ", ""))
     self.font.appendSFNTName("English (US)", "Fullname", enus)
     self.font.appendSFNTName("English (US)", "Preferred Family", enus)
     self.font.appendSFNTName("English (US)", "Preferred Styles", self.variant.strip())
