@@ -21,7 +21,6 @@ class TTFTask:
     enus = enusr + self.variant
     zhcnr = font[self.ui]["zh"]
     zhcn = zhcnr + self.variant
-    # self.font.fullname = enus
     self.font.fontname = enus.replace(" ", "")
     self.font.fullname = enus
     self.font.familyname = enusr
