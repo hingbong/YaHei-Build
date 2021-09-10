@@ -11,16 +11,26 @@ os2_codepagesList = [(537133471, -1006632960), (537919903, -1006632960)]
 class TTFTask:
   def __init__(self, font, variant, ui, index) -> None:
     self.font = font
-    self.variant = variant
+    for locale, name, value in font.sfnt_names:
+      if name == "Preferred Styles":
+        self.variant = value
+        break
     self.ui = ui
     self.index = index
+
+  def get_subfamily(self):
+    return None
 
   def edit(self):
     font = fontList[self.index]
     enusr = font[self.ui]["en"]
-    enus = enusr + self.variant
     zhcnr = font[self.ui]["zh"]
-    zhcn = zhcnr + self.variant
+    enus = enusr + " " + self.variant
+    zhcn = zhcnr + " " + self.variant
+    if self.variant == "Regular":
+      enus = enusr
+      zhcn = zhcnr
+    # self.font.fullname = enus
     self.font.fontname = enus.replace(" ", "")
     self.font.fullname = enus
     self.font.familyname = enusr
@@ -30,45 +40,33 @@ class TTFTask:
     self.font.os2_codepages = os2_codepagesList[self.index]
     self.font.appendSFNTName("English (US)", "Family", enusr)
     self.font.appendSFNTName("English (US)", "UniqueID", enus)
-    self.font.appendSFNTName("English (US)", "PostScriptName", enus.replace(" ", ""))
     self.font.appendSFNTName("English (US)", "Fullname", enus)
-    self.font.appendSFNTName("English (US)", "Preferred Family", enus)
-    self.font.appendSFNTName("English (US)", "Preferred Styles", self.variant.strip())
+    self.font.appendSFNTName("English (US)", "Preferred Family", enusr)
 
     self.font.appendSFNTName("Chinese (PRC)", "Family", zhcnr)
     self.font.appendSFNTName("Chinese (PRC)", "UniqueID", zhcn)
-    self.font.appendSFNTName("Chinese (PRC)", "PostScriptName", enus.replace(" ", ""))
     self.font.appendSFNTName("Chinese (PRC)", "Fullname", zhcn)
-    self.font.appendSFNTName("Chinese (PRC)", "Preferred Family", zhcn)
-    self.font.appendSFNTName("Chinese (PRC)", "Preferred Styles", self.variant.strip())
+    self.font.appendSFNTName("Chinese (PRC)", "Preferred Family", zhcnr)
 
     self.font.appendSFNTName("Chinese (Singapore)", "Family", zhcnr)
     self.font.appendSFNTName("Chinese (Singapore)", "UniqueID", zhcn)
-    self.font.appendSFNTName("Chinese (Singapore)", "PostScriptName", enus.replace(" ", ""))
     self.font.appendSFNTName("Chinese (Singapore)", "Fullname", zhcn)
-    self.font.appendSFNTName("Chinese (Singapore)", "Preferred Family", zhcn)
-    self.font.appendSFNTName("Chinese (Singapore)", "Preferred Styles", self.variant.strip())
+    self.font.appendSFNTName("Chinese (Singapore)", "Preferred Family", zhcnr)
 
     self.font.appendSFNTName("Chinese (Taiwan)", "Family", zhcnr)
     self.font.appendSFNTName("Chinese (Taiwan)", "UniqueID", zhcn)
-    self.font.appendSFNTName("Chinese (Taiwan)", "PostScriptName", enus.replace(" ", ""))
     self.font.appendSFNTName("Chinese (Taiwan)", "Fullname", zhcn)
-    self.font.appendSFNTName("Chinese (Taiwan)", "Preferred Family", zhcn)
-    self.font.appendSFNTName("Chinese (Taiwan)", "Preferred Styles", self.variant.strip())
+    self.font.appendSFNTName("Chinese (Taiwan)", "Preferred Family", zhcnr)
 
     self.font.appendSFNTName("Chinese (Hong Kong)", "Family", zhcnr)
     self.font.appendSFNTName("Chinese (Hong Kong)", "UniqueID", zhcn)
-    self.font.appendSFNTName("Chinese (Hong Kong)", "PostScriptName", enus.replace(" ", ""))
     self.font.appendSFNTName("Chinese (Hong Kong)", "Fullname", zhcn)
-    self.font.appendSFNTName("Chinese (Hong Kong)", "Preferred Family", zhcn)
-    self.font.appendSFNTName("Chinese (Hong Kong)", "Preferred Styles", self.variant.strip())
+    self.font.appendSFNTName("Chinese (Hong Kong)", "Preferred Family", zhcnr)
 
     self.font.appendSFNTName("Chinese (Macau)", "Family", zhcnr)
     self.font.appendSFNTName("Chinese (Macau)", "UniqueID", zhcn)
-    self.font.appendSFNTName("Chinese (Macau)", "PostScriptName", enus.replace(" ", ""))
     self.font.appendSFNTName("Chinese (Macau)", "Fullname", zhcn)
-    self.font.appendSFNTName("Chinese (Macau)", "Preferred Family", zhcn)
-    self.font.appendSFNTName("Chinese (Macau)", "Preferred Styles", self.variant.strip())
+    self.font.appendSFNTName("Chinese (Macau)", "Preferred Family", zhcnr)
     for (lang, key, field) in self.font.sfnt_names:
       print(lang, '%s=%s'%(key, field))
     # print(self.font.sfnt_names)
