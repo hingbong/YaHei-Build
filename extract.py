@@ -43,6 +43,11 @@ class TTFTask:
     self.font.appendSFNTName("English (US)", "Fullname", enus)
     self.font.appendSFNTName("English (US)", "Preferred Family", enusr)
 
+    self.font.appendSFNTName("English (Hong Kong)", "Family", enusr)
+    self.font.appendSFNTName("English (Hong Kong)", "UniqueID", enus)
+    self.font.appendSFNTName("English (Hong Kong)", "Fullname", enus)
+    self.font.appendSFNTName("English (Hong Kong)", "Preferred Family", enusr)
+
     self.font.appendSFNTName("Chinese (PRC)", "Family", zhcnr)
     self.font.appendSFNTName("Chinese (PRC)", "UniqueID", zhcn)
     self.font.appendSFNTName("Chinese (PRC)", "Fullname", zhcn)
