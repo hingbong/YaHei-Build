@@ -10,11 +10,13 @@ jobs:
     container: archlinux:latest
     steps:
     - name: Install dependencies
-      run: pacman -Syu --noconfirm git fontforge curl p7zip jq python-pip && pip3 install --user afdko
+      run: |
+        pacman -Syu --noconfirm git fontforge curl p7zip jq python-pip
+        pip3 install --user afdko
     - uses: actions/checkout@v2
     - name: Grab latest version
       run: |
-        git clone https://github.com/GuiWonder/SourceHanToClassic.git
+        git clone --depth=1 https://github.com/GuiWonder/SourceHanToClassic.git
         cd SourceHanToClassic
         TOOL_VERSION=`git rev-parse --short HEAD`
         cd ..
@@ -43,12 +45,18 @@ jobs:
         mkdir data
         cp out/SourceHanSans-*.ttf data
         ls data/
+        mkdir serif
+        cp out/SourceHanSerif-Regular.ttf serif
         rm -rf out
     - name: Run script
       run: |
         mkdir out
         cp -r data data1
-        python3 extract.py
+        python3 yahei.py
+        python3 simsun.py
+        ls 
+        /github/home/.local/bin/otf2otc -o out/simsun.ttc simsun.ttf nsimsun.ttf
+        ls out/*
     - name: Compress font
       run: |
         cd out
