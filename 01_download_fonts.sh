@@ -5,7 +5,7 @@ P=${GITHUB_WORKSPACE}
 cd $P
 mkdir src
 SOURCE_FILE_LINK=$P/source_link.json
-for link in `sed "s/UPSTREAM_VERSION/$UPSTREAM_VERSION/g" $SOURCE_FILE_LINK | jq -r '.[]'`; do
+for link in `cat $SOURCE_FILE_LINK | jq -r '.[]'`; do
 	echo $link
 	curl --output-dir src -OL "$link"
 done

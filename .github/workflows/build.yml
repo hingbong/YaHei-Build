@@ -11,8 +11,13 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        pacman -Syu --noconfirm git fontforge curl p7zip jq python-pip
+        echo "/github/home/.local/bin" >> $GITHUB_PATH
+        echo "/github/home/.deno/bin" >> $GITHUB_PATH
+        pacman -Syu --noconfirm git fontforge curl p7zip jq python-pip unzip
         pip3 install --user afdko
+        curl -fsSL https://deno.land/install.sh | sh
+        realpath ~/.deno/bin/deno
+        ~/.deno/bin/deno help
     - uses: actions/checkout@v2
     - name: Grab latest version
       run: |
@@ -20,17 +25,16 @@ jobs:
         cd SourceHanToClassic
         TOOL_VERSION=`git rev-parse --short HEAD`
         cd ..
-        curl -L https://api.github.com/repos/Pal3love/Source-Han-TrueType/releases/latest -o api.json
-        UPSTREAM_VERSION=$(cat api.json | jq -r .tag_name)
-        echo "UPSTREAM_VERSION=$UPSTREAM_VERSION" >> $GITHUB_ENV
         echo "TOOL_VERSION=$TOOL_VERSION" >> $GITHUB_ENV
-    - name: Run Scripts
+    - name: permission
       run: |
-        chmod +x 0*.sh *.py
+        chmod +x 0*.sh
+    - name: download
+      run: |
         ./01_download_fonts.sh
-        ./02_unzip_src.sh
-        ./03_split_ttc.sh
-        ./04_do.sh
+    - name: to_classic
+      run: |
+        ./02_to_classic.sh
     - name: Compress font
       run: |
         cd out
@@ -43,19 +47,19 @@ jobs:
     - name: Copy font
       run: | 
         mkdir data
-        cp out/SourceHanSans-*.ttf data
+        cp out/SourceHanSans-*.otf data
         ls data/
         mkdir serif
-        cp out/SourceHanSerif-Regular.ttf serif
+        cp out/SourceHanSerif-Regular.otf serif
         rm -rf out
     - name: Run script
       run: |
         mkdir out
-        cp -r data data1
-        python3 yahei.py
-        python3 simsun.py
-        ls 
-        /github/home/.local/bin/otf2otc -o out/simsun.ttc simsun.ttf nsimsun.ttf
+        echo "----------------------"
+        deno run --allow-all --v8-flags=--max-old-space-size=8192 yahei.js
+        echo "----------------------"
+        deno run --allow-all --v8-flags=--max-old-space-size=8192 simsun.ts
+        echo "----------------------"
         ls out/*
     - name: Compress font
       run: |
@@ -70,7 +74,7 @@ jobs:
       uses: marvinpinto/action-automatic-releases@latest
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "upstream-${{ env.UPSTREAM_VERSION }}-SourceHanToClassic-${{env.TOOL_VERSION}}"
+        automatic_release_tag: "SourceHanToClassic-${{env.TOOL_VERSION}}"
         prerelease: true
         title: Nightly build
         files: |
