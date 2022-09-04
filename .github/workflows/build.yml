@@ -19,46 +19,15 @@ jobs:
         realpath ~/.deno/bin/deno
         ~/.deno/bin/deno help
     - uses: actions/checkout@v2
-    - name: Grab latest version
-      run: |
-        git clone --depth=1 https://github.com/GuiWonder/SourceHanToClassic.git
-        cd SourceHanToClassic
-        TOOL_VERSION=`git rev-parse --short HEAD`
-        cd ..
-        echo "TOOL_VERSION=$TOOL_VERSION" >> $GITHUB_ENV
-    - name: permission
-      run: |
-        chmod +x 0*.sh
-    - name: download
-      run: |
-        ./01_download_fonts.sh
-    - name: to_classic
-      run: |
-        ./02_to_classic.sh
-    - name: Compress font
-      run: |
-        cd out
-        7z a ../Advocate-Ancient.zip *
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: Advocate Ancient
-        path: Advocate-Ancient.zip
-    - name: Copy font
-      run: | 
-        mkdir data
-        cp out/SourceHanSans-*.otf data
-        ls data/
-        mkdir serif
-        cp out/SourceHanSerif-Regular.otf serif
-        rm -rf out
+    - name: download_judou_sans
+      run: deno run --config ./deno.json --allow-all --v8-flags=--max-old-space-size=8192 download_judou_sans.ts
     - name: Run script
       run: |
         mkdir out
         echo "----------------------"
-        deno run --allow-all --v8-flags=--max-old-space-size=8192 yahei.js
+        deno run --config ./deno.json --allow-all --v8-flags=--max-old-space-size=8192 yahei.js
         echo "----------------------"
-        deno run --allow-all --v8-flags=--max-old-space-size=8192 simsun.ts
+        deno run --config ./deno.json --allow-all --v8-flags=--max-old-space-size=8192 simsun.ts
         echo "----------------------"
         ls out/*
     - name: Compress font
@@ -71,12 +40,8 @@ jobs:
         name: YaHei
         path: YaHei.zip
     - name: Upload release
-      uses: marvinpinto/action-automatic-releases@latest
+      uses: ncipollo/release-action@v1
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "SourceHanToClassic-${{env.TOOL_VERSION}}"
-        prerelease: true
-        title: Nightly build
-        files: |
-            YaHei.zip
-            Advocate-Ancient.zip
+        token: "${{ secrets.GITHUB_TOKEN }}"
+        tag: "JudouSans-${{env.JUDOU_SANS_VERSION}}-UI-${{env.JUDOU_SANS_UI_VERSION}}-I.MING-${{env.I_MING_VERSION}}"
+        artifacts: YaHei.zip

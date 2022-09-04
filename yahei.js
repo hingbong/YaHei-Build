@@ -1,7 +1,7 @@
 const UI = "UI"
 const SANS = "SANS"
 
-import {runProcess, AAJP_SANS, getNames, buildOtf, getFontObject, writeJson} from "./utils.ts"
+import {runProcess, getNames, buildOtf, getFontObject, writeJson} from "./utils.ts"
 
 const fontList = {
     "YH": {
@@ -71,26 +71,14 @@ const getNameString = (nameObject, languageID) => {
 
 const nameOfWeight = (weight) => {
     let result = ""
-    switch (weight) {
-        case "Bold":
-            result = "bd"
-            break
-        case "Heavy":
-            result = "hv"
-            break
-        case "Light":
-            result = "l"
-            break
-        case "ExtraLight":
-            result = "xl"
-            break
-        case "Medium":
-            result = "md"
-            break
-        case "Normal":
-            result = "nm"
-            break
-    }
+    if (weight.includes("Bold")) result += "bd"
+    if (weight.includes("Xlight")) result += "xl"
+    if (weight.includes("Extralight")) result += "xl"
+    if (weight.includes("Heavy")) result += "hv"
+    if (weight.includes("Light")) result += "l"
+    if (weight.includes("Medium")) result += "md"
+    if (weight.includes("Semilight")) result += "sl"
+    if (weight.includes("Italic")) result += "i"
     return result
 }
 
@@ -132,7 +120,7 @@ const patchNameObject = async (fontObject, nameObject, fontName, SansOrUi, weigh
     fontObject["name"] = nameObject.concat(lackEngNameList, lackCnNameList)
     fontObject["meta"] = fontList[fontName]["meta"]
     writeJson(`temp/${fontList[fontName]["FILENAME"]}${fontNameSuffix}${nameOfWeight(weight)}.json`, fontObject)
-    const otfFileName = `temp/${fontList[fontName]["FILENAME"]}${fontNameSuffix}${nameOfWeight(weight)}.otf`
+    const otfFileName = `temp/${fontList[fontName]["FILENAME"]}${fontNameSuffix}${nameOfWeight(weight)}.ttf`
     await buildOtf(otfFileName, `temp/${fontList[fontName]["FILENAME"]}${fontNameSuffix}${nameOfWeight(weight)}.json`)
     console.log(`${otfFileName} built`)
 }
@@ -182,36 +170,40 @@ const patchCFFObject = (fontObject, fontName, SansOrUi, weight, needToReplaceNam
 // languageID为 `0`, `1033`, `15369`使用英文名称，其余使用中文
 //
 // Regular不在名称上标识
-const build = async (otf) => {
-    const font = await getFontObject(otf)
-    console.log(`${otf} object read finished`)
-    const name = font["name"]
+const build = async (sansFontFile, uiFontFile) => {
+    const sansFont = await getFontObject(sansFontFile)
+    console.log(`${sansFontFile} object read finished`)
+    const uiFont = await getFontObject(uiFontFile)
+    console.log(`${uiFontFile} object read finished`)
+    const sansName = sansFont["name"]
+    const uiName = uiFont["name"]
     // 字重
-    const weight = font["CFF_"]?.weight ?? name.find(element => element["nameID"] === 17)["nameString"]
-    console.log(`current font weight is ${weight}`)
+    const sansWeight = sansName["CFF_"]?.weight ?? sansName.find(element => element["nameID"] === 17)["nameString"]
+    const uiWeight = uiName["CFF_"]?.weight ?? uiName.find(element => element["nameID"] === 17)["nameString"]
+    console.log(`sansWeight: ${sansWeight}, uiWeight: ${uiWeight}`)
+    if (sansWeight !== uiWeight) throw new Error("sansWeight !== uiWeight")
     // 微软雅黑
-    let nextReplaceName = patchCFFObject(font, "YH", SANS, weight, `${AAJP_SANS}-${weight}`)
-    await patchNameObject(font, name, "YH", SANS, weight)
+    let nextSansReplaceName = patchCFFObject(sansFont, "YH", SANS, sansWeight, "")
+    await patchNameObject(sansFont, sansName, "YH", SANS, sansWeight)
     // 微软雅黑UI
-    nextReplaceName = patchCFFObject(font, "YH", UI, weight, nextReplaceName)
-    await patchNameObject(font, name, "YH", UI, weight)
-    const yhTTC = `out/${fontList["YH"]["FILENAME"]}${nameOfWeight(weight)}.ttc`
-    await runProcess(["otf2otc", "-o", yhTTC, `temp/${fontList["YH"]["FILENAME"]}${nameOfWeight(weight)}.otf`, `temp/${fontList["YH"]["FILENAME"]}ui${nameOfWeight(weight)}.otf`])
+    let nextUiReplaceName = patchCFFObject(uiFont, "YH", UI, uiWeight, "")
+    await patchNameObject(uiFont, uiName, "YH", UI, uiWeight)
+    const yhTTC = `out/${fontList["YH"]["FILENAME"]}${nameOfWeight(sansWeight)}.ttc`
+    await runProcess(["otf2otc", "-o", yhTTC, `temp/${fontList["YH"]["FILENAME"]}${nameOfWeight(sansWeight)}.ttf`, `temp/${fontList["YH"]["FILENAME"]}ui${nameOfWeight(uiWeight)}.ttf`])
     console.log(`${yhTTC} built`)
     // 微软正黑
-    nextReplaceName = patchCFFObject(font, "JH", SANS, weight, nextReplaceName)
-    await patchNameObject(font, name, "JH", SANS, weight)
+    patchCFFObject(sansFont, "JH", SANS, sansWeight, nextSansReplaceName)
+    await patchNameObject(sansFont, sansName, "JH", SANS, sansWeight)
     // 微软正黑UI
-    patchCFFObject(font, "JH", UI, weight, nextReplaceName)
-    await patchNameObject(font, name, "JH", UI, weight)
-    const jhTTC = `out/${fontList["JH"]["FILENAME"]}${nameOfWeight(weight)}.ttc`
-    await runProcess(["otf2otc", "-o", jhTTC, `temp/${fontList["JH"]["FILENAME"]}${nameOfWeight(weight)}.otf`, `temp/${fontList["JH"]["FILENAME"]}ui${nameOfWeight(weight)}.otf`])
+    patchCFFObject(sansFont, "JH", UI, sansWeight, nextUiReplaceName)
+    await patchNameObject(uiFont, uiName, "JH", UI, uiWeight)
+    const jhTTC = `out/${fontList["JH"]["FILENAME"]}${nameOfWeight(sansWeight)}.ttc`
+    await runProcess(["otf2otc", "-o", jhTTC, `temp/${fontList["JH"]["FILENAME"]}${nameOfWeight(sansWeight)}.ttf`, `temp/${fontList["JH"]["FILENAME"]}ui${nameOfWeight(uiWeight)}.ttf`])
     console.log(`${jhTTC} built`)
 }
 
-const files = await getNames("data")
+const files = (await getNames("data")).sort()
 console.log(`prepare to build ${files}`)
-await Deno.mkdir("temp")
-for (const file of files) {
-    await build(file)
+for (const file of files.filter(file => file.includes("sans"))) {
+    await build(file, file.replace("sans", "ui"))
 }

@@ -1,4 +1,4 @@
-import {runProcess, getFontObject, buildOtf, writeJson, AAJP_Serif} from "./utils.ts"
+import {runProcess, getFontObject, buildOtf, writeJson, AAJP_Serif, download, writeToGithubEnv} from "./utils.ts"
 
 const fontList = {
     "simsun": {
@@ -37,17 +37,18 @@ const fontList = {
         }
     }
 }
+
 const patchCFFObject = (fontObject: any, fontName: "simsun" | "nsimsun") => {
     const CFFObject = fontObject["CFF_"]
     if (!CFFObject) return
-    const enName = fontList[fontName].name
+    const enName: string = fontList[fontName].name
     const enNameCompat = enName.replaceAll(" ", "")
     CFFObject["fontName"] = enName
     CFFObject["fullName"] = enName
     CFFObject["familyName"] = enName
     const fdArray = CFFObject["fdArray"]
     if (!fdArray) return
-    const newFd = {}
+    const newFd: Record<any, any> = {}
     Object.keys(fdArray).forEach(key => {
         newFd[key.replace(`${AAJP_Serif}-Regular`, enNameCompat)] = fdArray[key]
     })
@@ -60,8 +61,14 @@ const patchCFFObject = (fontObject: any, fontName: "simsun" | "nsimsun") => {
         }
     })
 }
-const font = await getFontObject("serif/SourceHanSerif-Regular.otf")
-console.log("get SourceHanSerif-Regular.otf font object")
+
+const i_dim_version = "7.01"
+const i_dim = `https://github.com/ichitenfont/I.Ming/raw/master/${i_dim_version}/I.MingCP-${i_dim_version}.ttf`
+await Deno.mkdir("serif")
+await download(i_dim, `serif/I.MingCP-${i_dim_version}.ttf`)
+
+const font = await getFontObject(`serif/I.MingCP-${i_dim_version}.ttf`)
+console.log(`get serif/I.MingCP-${i_dim_version}.ttf font object`)
 // 宋体
 const simsunName = JSON.parse(Deno.readTextFileSync("simsun-name.json"))
 font["name"] = simsunName
@@ -69,7 +76,7 @@ patchCFFObject(font, "simsun")
 font["meta"] = fontList["simsun"]["meta"]
 const simsunJsonPath = `temp/${fontList["simsun"].FILENAME}.json`
 await writeJson(simsunJsonPath, font)
-const simsunFilePath = `temp/${fontList["simsun"].FILENAME}.otf`
+const simsunFilePath = `temp/${fontList["simsun"].FILENAME}.ttf`
 await buildOtf(simsunFilePath, simsunJsonPath)
 console.log(`${simsunFilePath} built`)
 // 新宋体
@@ -79,9 +86,14 @@ patchCFFObject(font, "nsimsun")
 font["meta"] = fontList["nsimsun"]["meta"]
 const nsimsunJsonPath = `temp/${fontList["nsimsun"].FILENAME}.json`
 await writeJson(nsimsunJsonPath, font)
-const nsimsunFilePath = `temp/${fontList["nsimsun"].FILENAME}.otf`
+const nsimsunFilePath = `temp/${fontList["nsimsun"].FILENAME}.ttf`
 await buildOtf(nsimsunFilePath, nsimsunJsonPath)
 console.log(`${nsimsunFilePath} built`)
 
 await runProcess(["otf2otc", "-o", "out/simsun.ttc", simsunFilePath, nsimsunFilePath])
 console.log(`out/simsun.ttc built`)
+
+await writeToGithubEnv([{
+    key: "I_MING_VERSION",
+    value: i_dim_version
+}])
