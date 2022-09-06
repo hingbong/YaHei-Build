@@ -1,4 +1,13 @@
-import {runProcess, getFontObject, buildOtf, writeJson, AAJP_Serif, download, writeToGithubEnv} from "./utils.ts"
+import {
+    runProcess,
+    getFontObject,
+    buildOtf,
+    writeJson,
+    AAJP_Serif,
+    download,
+    writeToGithubEnv,
+    GithubRelease
+} from "./utils.ts"
 
 const fontList = {
     "simsun": {
@@ -61,9 +70,11 @@ const patchCFFObject = (fontObject: any, fontName: "simsun" | "nsimsun") => {
         }
     })
 }
-
-const i_dim_version = "7.01"
-const i_dim = `https://github.com/ichitenfont/I.Ming/raw/master/${i_dim_version}/I.MingCP-${i_dim_version}.ttf`
+const api = "https://api.github.com/repos/ichitenfont/I.Ming/releases/latest"
+const release: GithubRelease = (await (await fetch(api)).json())
+console.log(`I.Ming's latest tag: ${release.name}`)
+const i_dim_version = release.tag_name
+const i_dim = `https://github.com/ichitenfont/I.Ming/raw/master/${i_dim_version}/PMingI.U-${i_dim_version}.ttf`
 await Deno.mkdir("serif")
 await download(i_dim, `serif/I.MingCP-${i_dim_version}.ttf`)
 
