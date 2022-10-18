@@ -4,8 +4,8 @@ const api = "https://api.github.com/repos/JudouMetamedia/JudouSans/releases"
 const releases: Array<GithubRelease> = (await (await fetch(api)).json()).sort((a: GithubRelease, b: GithubRelease) =>
     Date.parse(b.published_at) - Date.parse(a.published_at))
 console.log(`releases: ${releases.map(release => release.name).join("\n")}`)
-const sansRegex = new RegExp("judou-sans-cl-ttf-unhinted-(.*).7z")
-const uiRegex = new RegExp("judou-sans-ui-cl-ttf-unhinted-(.*).7z")
+const sansRegex = new RegExp("judou-sans-hant-ttf-unhinted-(.*).7z")
+const uiRegex = new RegExp("judou-sans-ui-hant-ttf-unhinted-(.*).7z")
 const sansAssets = releases.flatMap(release => {
     const assets = release.assets
     return assets.filter(asset => sansRegex.test(asset.name))
@@ -40,5 +40,5 @@ await writeToGithubEnv([
     {key: "JUDOU_SANS_UI_VERSION", value: uiVersion}
 ])
 await Deno.mkdir("data")
-await runProcess(["7z", "x", "-odata", `temp/${sansAsset.name}`])
-await runProcess(["7z", "x", "-odata", `temp/${uiAsset.name}`])
+await runProcess(["7z", "x", "-odata", "-x!*.txt", `temp/${sansAsset.name}`])
+await runProcess(["7z", "x", "-odata", "-x!*.txt", `temp/${uiAsset.name}`])
