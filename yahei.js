@@ -1,7 +1,7 @@
 const UI = "UI"
 const SANS = "SANS"
 
-import {runProcess, getNames, buildOtf, getFontObject, writeJson} from "./utils.ts"
+import {runProcess, getNames, buildOtf, getFontObject, writeJson, needChangeNames} from "./utils.ts"
 
 const fontList = {
     "YH": {
@@ -60,7 +60,6 @@ const englishLangs = [0, 1033, 15369]
 // 15369 English - Hong Kong SAR
 // const allLangs = [1028, 1033, 1041, 1042, 2052, 3076, 4100, 5124, 15369]
 const cnLangs = [1028, 1041, 1042, 2052, 3076, 4100, 5124]
-const needChangeNames = [1, 3, 4, 6, 16]
 const getNameString = (nameObject, languageID) => {
     if (englishLangs.includes(languageID)) {
         return nameObject["EN"]
@@ -178,8 +177,8 @@ const build = async (sansFontFile, uiFontFile) => {
     const sansName = sansFont["name"]
     const uiName = uiFont["name"]
     // 字重
-    const sansWeight = sansName["CFF_"]?.weight ?? sansName.find(element => element["nameID"] === 17)["nameString"]
-    const uiWeight = uiName["CFF_"]?.weight ?? uiName.find(element => element["nameID"] === 17)["nameString"]
+    const sansWeight = sansFont["CFF_"]?.weight ?? sansName.find(element => element["nameID"] === 17)["nameString"]
+    const uiWeight = uiFont["CFF_"]?.weight ?? uiName.find(element => element["nameID"] === 17)["nameString"]
     console.log(`sansWeight: ${sansWeight}, uiWeight: ${uiWeight}`)
     if (sansWeight !== uiWeight) throw new Error("sansWeight !== uiWeight")
     // 微软雅黑

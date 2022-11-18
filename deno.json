@@ -1,7 +1,4 @@
 {
   "compilerOptions": {
-    "module": "esnext",
-    "target": "esnext",
-    "useDefineForClassFields": true
   }
 }

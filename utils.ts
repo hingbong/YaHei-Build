@@ -45,6 +45,8 @@ export const getFontObject = async (filePath: string) => {
     return JSON.parse(Deno.readTextFileSync("temp/temp.json"))
 }
 
+export const needChangeNames = [1, 3, 4, 6, 16]
+
 export function writeJson(filePath: string, o: any) {
     Deno.writeTextFileSync(filePath, JSON.stringify(o))
 }

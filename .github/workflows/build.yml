@@ -29,6 +29,8 @@ jobs:
         echo "----------------------"
         deno run --config ./deno.json --allow-all --v8-flags=--max-old-space-size=8192 simsun.ts
         echo "----------------------"
+        deno run --config ./deno.json --allow-all --v8-flags=--max-old-space-size=8192 droid-sans-mono.ts
+        echo "----------------------"
         ls out/*
     - name: Compress font
       run: |
