@@ -1,7 +1,7 @@
 const UI = "UI"
 const SANS = "SANS"
 
-import {runProcess, getNames, buildOtf, getFontObject, writeJson, needChangeNames} from "./utils.ts"
+import {runProcess, listDir, buildOtf, getFontObject, writeJson, needChangeNames} from "./utils.ts"
 
 const fontList = {
     "YH": {
@@ -177,8 +177,10 @@ const build = async (sansFontFile, uiFontFile) => {
     const sansName = sansFont["name"]
     const uiName = uiFont["name"]
     // 字重
-    const sansWeight = sansFont["CFF_"]?.weight ?? sansName.find(element => element["nameID"] === 17)["nameString"]
-    const uiWeight = uiFont["CFF_"]?.weight ?? uiName.find(element => element["nameID"] === 17)["nameString"]
+    const sansWeight = sansFont["CFF_"]?.weight ?? sansName.find(element => element["nameID"] === 17)?.nameString ??
+        sansName.find(element => element["nameID"] === 2).nameString
+    const uiWeight = uiFont["CFF_"]?.weight ?? uiName.find(element => element["nameID"] === 17)?.nameString ??
+        uiName.find(element => element["nameID"] === 2).nameString
     console.log(`sansWeight: ${sansWeight}, uiWeight: ${uiWeight}`)
     if (sansWeight !== uiWeight) throw new Error("sansWeight !== uiWeight")
     // 微软雅黑
@@ -201,8 +203,9 @@ const build = async (sansFontFile, uiFontFile) => {
     console.log(`${jhTTC} built`)
 }
 
-const files = (await getNames("data")).sort()
+const files = (await listDir("data")).sort()
 console.log(`prepare to build ${files}`)
-for (const file of files.filter(file => file.includes("sans"))) {
-    await build(file, file.replace("sans", "ui"))
+// Normal is same weight with Regular
+for (const file of files.filter(file => file.includes("HW") && !file.includes("Normal"))) {
+    await build(file.replace("HW", ""), file)
 }

@@ -19,8 +19,8 @@ jobs:
         realpath ~/.deno/bin/deno
         ~/.deno/bin/deno help
     - uses: actions/checkout@v3
-    - name: download_judou_sans
-      run: deno run --config ./deno.json --allow-all --v8-flags=--max-old-space-size=8192 download_judou_sans.ts
+    - name: download_sans
+      run: deno run --config ./deno.json --allow-all --v8-flags=--max-old-space-size=8192 download_sans.ts
     - name: Run script
       run: |
         mkdir out
@@ -45,6 +45,7 @@ jobs:
       uses: ncipollo/release-action@v1
       with:
         token: "${{ secrets.GITHUB_TOKEN }}"
-        tag: "JudouSans-${{env.JUDOU_SANS_VERSION}}-UI-${{env.JUDOU_SANS_UI_VERSION}}-I.MING-${{env.I_MING_VERSION}}"
+        body: ""
+        tag: "YAHEI-${{env.SANS_VERSION}}-UI-${{env.SANS_UI_VERSION}}-S-${{env.SERIF_VERSION}}"
         artifacts: YaHei.zip
         allowUpdates: true

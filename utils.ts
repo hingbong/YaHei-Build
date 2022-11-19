@@ -17,7 +17,7 @@ export async function runProcess(command: string[], log: boolean = true): Promis
     }
 }
 
-export async function getNames(currentPath: string): Promise<string[]> {
+export async function listDir(currentPath: string): Promise<string[]> {
 
     const names: string[] = []
 

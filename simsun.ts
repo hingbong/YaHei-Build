@@ -105,6 +105,6 @@ await runProcess(["otf2otc", "-o", "out/simsun.ttc", simsunFilePath, nsimsunFile
 console.log(`out/simsun.ttc built`)
 
 await writeToGithubEnv([{
-    key: "I_MING_VERSION",
+    key: "SERIF_VERSION",
     value: i_dim_version
 }])
