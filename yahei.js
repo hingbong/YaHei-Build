@@ -91,10 +91,10 @@ const patchNameObject = async (fontObject, nameObject, fontName, SansOrUi, weigh
                     break
                 case 3:
                 case 4:
-                    element["nameString"] = getNameString(fontList[fontName][SansOrUi], element["languageID"]) + (weight === "Regular" ? "" : ` ${weight}`)
+                    element["nameString"] = getNameString(fontList[fontName][SansOrUi], element["languageID"]) + ((weight === "Regular" || weight === "Normal") ? "" : ` ${weight}`)
                     break
                 case 6:
-                    element["nameString"] = getNameString(fontList[fontName][SansOrUi], element["languageID"]).replaceAll(" ", "") + (weight === "Regular" ? "" : weight)
+                    element["nameString"] = getNameString(fontList[fontName][SansOrUi], element["languageID"]).replaceAll(" ", "") + ((weight === "Regular" || weight === "Normal") ? "" : weight)
                     break
             }
         })
@@ -129,9 +129,9 @@ const patchCFFObject = (fontObject, fontName, SansOrUi, weight, needToReplaceNam
     if (!CFFObject) return
     const enName = fontList[fontName][SansOrUi]["EN"]
     const enNameCompat = enName.replaceAll(" ", "")
-    const enNameCompatWithWeight = weight === "Regular" ? enNameCompat : (enNameCompat + weight)
+    const enNameCompatWithWeight = (weight === "Regular" || weight === "Normal") ? enNameCompat : (enNameCompat + weight)
     CFFObject["fontName"] = enNameCompatWithWeight
-    CFFObject["fullName"] = weight === "Regular" ? enName : (enName + " " + weight)
+    CFFObject["fullName"] = (weight === "Regular" || weight === "Normal") ? enName : (enName + " " + weight)
     CFFObject["familyName"] = enName
     const fdArray = CFFObject["fdArray"]
     if (!fdArray) return
@@ -168,7 +168,7 @@ const patchCFFObject = (fontObject, fontName, SansOrUi, weight, needToReplaceNam
 //
 // languageID为 `0`, `1033`, `15369`使用英文名称，其余使用中文
 //
-// Regular不在名称上标识
+// Regular/Normal不在名称上标识
 const build = async (sansFontFile, uiFontFile) => {
     const sansFont = await getFontObject(sansFontFile)
     console.log(`${sansFontFile} object read finished`)
@@ -206,6 +206,6 @@ const build = async (sansFontFile, uiFontFile) => {
 const files = (await listDir("data")).sort()
 console.log(`prepare to build ${files}`)
 // Normal is same weight with Regular
-for (const file of files.filter(file => file.includes("HW") && !file.includes("Normal"))) {
-    await build(file.replace("HW", ""), file)
+for (const file of files.filter(file => file.endsWith(".ttf") && !file.includes("HW") && !file.includes("Normal"))) {
+    await build(file, file)
 }
