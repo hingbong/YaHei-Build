@@ -70,16 +70,29 @@ const patchCFFObject = (fontObject: any, fontName: "simsun" | "nsimsun") => {
         }
     })
 }
-const api = "https://api.github.com/repos/ichitenfont/I.Ming/releases/latest"
-const release: GithubRelease = (await (await fetch(api)).json())
-console.log(`I.Ming's latest tag: ${release.name}`)
-const i_dim_version = release.tag_name
-const i_dim = `https://github.com/ichitenfont/I.Ming/raw/master/${i_dim_version}/PMingI.U-${i_dim_version}.ttf`
-await Deno.mkdir("serif")
-await download(i_dim, `serif/I.MingCP-${i_dim_version}.ttf`)
+const api = "https://api.github.com/repos/GuiWonder/SourceHanToClassic/releases"
+const releases: Array<GithubRelease> = (await (await fetch(api)).json()).sort((a: GithubRelease, b: GithubRelease) =>
+    Date.parse(b.published_at) - Date.parse(a.published_at))
+console.log(`releases: ${releases.map(release => release.name).join("\n")}`)
 
-const font = await getFontObject(`serif/I.MingCP-${i_dim_version}.ttf`)
-console.log(`get serif/I.MingCP-${i_dim_version}.ttf font object`)
+const tagReg = RegExp("(.*-ttf)")
+
+const latest = releases.find(release => tagReg.test(release.tag_name))
+if (!latest) throw new Error("cannot get latest ttf")
+
+console.log(`latest: ${JSON.stringify(latest, null, 2)}`)
+const asset = latest.assets.find(asset => asset.name === "AdvocateAncientSerifTTFs.7z")
+if (!asset) throw new Error("cannot get latest ttf asset")
+console.log(`Serif latest tag: ${latest.name}`)
+const serifVersion = latest.tag_name
+const dLink = asset.browser_download_url
+await Deno.mkdir("serif")
+await download(dLink, `temp/${asset.name}`)
+await runProcess(["7z", "x", "-oserif", "-x!*.txt", `temp/${asset.name}`])
+
+
+const font = await getFontObject(`serif/AdvocateAncientSerifJP/AdvocateAncientSerifJP-Regular.ttf`)
+console.log(`get serif/AdvocateAncientSerifJP/AdvocateAncientSerifJP-Regular.ttf font object`)
 // 宋体
 const simsunName = JSON.parse(Deno.readTextFileSync("simsun-name.json"))
 font["name"] = simsunName
@@ -106,5 +119,5 @@ console.log(`out/simsun.ttc built`)
 
 await writeToGithubEnv([{
     key: "SERIF_VERSION",
-    value: i_dim_version
+    value: serifVersion
 }])
