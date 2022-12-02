@@ -159,7 +159,8 @@ const patchNameObject = async (fontObject, nameObject, fontName, SansOrUi, weigh
 
 const patchCFFObject = (fontObject, fontName, SansOrUi, weight, needToReplaceName) => {
     const CFFObject = fontObject["CFF_"]
-    if (!CFFObject) return
+    if (CFFObject != undefined) throw new Error("do not support postscript for now")
+    return;
     const enName = fontList[fontName][SansOrUi]["EN"]
     const enNameCompat = enName.replaceAll(" ", "")
     const enNameCompatWithWeight = (weight === "Regular" || weight === "Normal") ? enNameCompat : (enNameCompat + weight)

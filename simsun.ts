@@ -52,7 +52,8 @@ const fontList = {
 
 const patchCFFObject = (fontObject: any, fontName: "simsun" | "nsimsun") => {
     const CFFObject = fontObject["CFF_"]
-    if (CFFObject) throw ("do not support postscript for now")
+    if (CFFObject != undefined) throw new Error("do not support postscript for now")
+    return;
     const enName: string = fontList[fontName].name
     const enNameCompat = enName.replaceAll(" ", "")
     CFFObject["fontName"] = enName
@@ -120,6 +121,22 @@ console.log(`${nsimsunFilePath} built`)
 await runProcess(["otf2otc", "-o", "out/simsun.ttc", simsunFilePath, nsimsunFilePath])
 
 
+// msmincho
+const msminchoA: any[] = JSON.parse(Deno.readTextFileSync("msmincho.json"))
+for (const index in msminchoA) {
+    font["name"] = msminchoA[index]["name"]
+    font["meta"] = msminchoA[index]["meta"]
+    const tempJsonPath = `temp/msmincho${index}.json`
+    await writeJson(tempJsonPath, font)
+    const tempFilePath = `temp/msmincho${index}.ttf`
+    await buildOtf(tempFilePath, tempJsonPath)
+    console.log(`${tempFilePath} built`)
+}
+const msminchoTTFs: string[] = msminchoA.map((_, index) =>
+    `temp/msmincho${index}.ttf`
+)
+await runProcess(["otf2otc", "-o", "out/msmincho.ttc", simsunFilePath, nsimsunFilePath].concat(msminchoTTFs))
+
 // msgothic
 const fontFile = readEnv("SANS_REGULAR_FONT_PATH")!!
 const sansFont = await getFontObject(fontFile)
@@ -127,7 +144,7 @@ console.log(`get ${fontFile} font object`)
 const msgothicA: any[] = JSON.parse(Deno.readTextFileSync("msgothic.json"))
 for (const index in msgothicA) {
     sansFont["name"] = msgothicA[index]["name"]
-    sansFont["meta"] = fontList["nsimsun"]["meta"]
+    sansFont["meta"] = msgothicA[index]["meta"]
     const tempJsonPath = `temp/msgothic${index}.json`
     await writeJson(tempJsonPath, sansFont)
     const tempFilePath = `temp/msgothic${index}.ttf`
