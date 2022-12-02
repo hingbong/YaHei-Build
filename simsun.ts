@@ -135,10 +135,11 @@ for (const index in msminchoA) {
 const msminchoTTFs: string[] = msminchoA.map((_, index) =>
     `temp/msmincho${index}.ttf`
 )
-await runProcess(["otf2otc", "-o", "out/msmincho.ttc", simsunFilePath, nsimsunFilePath].concat(msminchoTTFs))
+await runProcess(["otf2otc", "-o", "out/msmincho.ttc"].concat(msminchoTTFs))
 
 // msgothic
 const fontFile = readEnv("SANS_REGULAR_FONT_PATH")!!
+console.log(`msgothic font origin path ${fontFile}`);
 const sansFont = await getFontObject(fontFile)
 console.log(`get ${fontFile} font object`)
 const msgothicA: any[] = JSON.parse(Deno.readTextFileSync("msgothic.json"))
@@ -154,7 +155,7 @@ for (const index in msgothicA) {
 const msgothicTTFs: string[] = msgothicA.map((_, index) =>
     `temp/msgothic${index}.ttf`
 )
-await runProcess(["otf2otc", "-o", "out/msgothic.ttc", simsunFilePath, nsimsunFilePath].concat(msgothicTTFs))
+await runProcess(["otf2otc", "-o", "out/msgothic.ttc"].concat(msgothicTTFs))
 
 console.log(`out/msgothic.ttc built`)
 

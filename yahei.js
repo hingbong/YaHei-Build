@@ -8,8 +8,7 @@ import {
     getFontObject,
     writeJson,
     needChangeNames,
-    writeToGithubEnv,
-    writeToEnv
+    writeToGithubEnv
 } from "./utils.ts"
 
 const fontList = {
@@ -69,7 +68,30 @@ const fontList = {
                 }
             ]
         }
+    },
+    "YuGothic" :{ UI: {
+            "EN": "Yu Gothic UI", "CN": "Yu Gothic UI"
+        },
+        SANS: {
+            "EN": "Yu Gothic", "CN": "游ゴシック"
+        },
+        "FILENAME": "YuGoth",
+        "meta": {
+            "version": 1,
+            "flags": 0,
+            "entries": [
+                {
+                    "tag": "dlng",
+                    "string": "Jpan, Hrkt, Hira, Kana"
+                },
+                {
+                    "tag": "slng",
+                    "string": "Jpan, Hrkt, Hira, Kana, Latn, Grek, Cyrl"
+                }
+            ]
+        }
     }
+
 }
 
 
@@ -245,6 +267,16 @@ const build = async (sansFontFile, uiFontFile) => {
     const mrTTC = `out/${fontList["MEIRYO"]["FILENAME"]}${nameOfWeight(sansWeight)}.ttc`
     await runProcess(["otf2otc", "-o", mrTTC, `temp/${fontList["MEIRYO"]["FILENAME"]}${nameOfWeight(sansWeight)}.ttf`, `temp/${fontList["MEIRYO"]["FILENAME"]}ui${nameOfWeight(uiWeight)}.ttf`])
     console.log(`${mrTTC} built`)
+
+    // YuGothic
+    nextSansReplaceName = patchCFFObject(sansFont, "YuGothic", SANS, sansWeight, nextSansReplaceName)
+    await patchNameObject(sansFont, sansName, "YuGothic", SANS, sansWeight)
+    // YuGothicUI
+    nextUiReplaceName = patchCFFObject(uiFont, "YuGothic", UI, uiWeight, nextUiReplaceName)
+    await patchNameObject(uiFont, uiName, "YuGothic", UI, uiWeight)
+    const yuTTC = `out/${fontList["YuGothic"]["FILENAME"]}${nameOfWeight(sansWeight)}.ttc`
+    await runProcess(["otf2otc", "-o", yuTTC, `temp/${fontList["YuGothic"]["FILENAME"]}${nameOfWeight(sansWeight)}.ttf`, `temp/${fontList["YuGothic"]["FILENAME"]}ui${nameOfWeight(uiWeight)}.ttf`])
+    console.log(`${mrTTC} built`)
 }
 
 const files = (await listDir("data")).sort()
@@ -255,6 +287,5 @@ for (const file of files.filter(file => file.endsWith(".ttf") && !file.includes(
     if (file.includes("Regular")) {
         const regularPath = [{key: "SANS_REGULAR_FONT_PATH", value: file}]
         await writeToGithubEnv(regularPath)
-        writeToEnv(regularPath)
     }
 }
