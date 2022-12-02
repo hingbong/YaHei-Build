@@ -21,7 +21,8 @@ const fontList = {
                 "tag": "slng", "string": "Hans, Bopo, Grek, Hani, Hant, Hira, Kana, Latn, Hant-HK"
             }]
         }
-    }, "JH": {
+    },
+    "JH": {
         UI: {
             "EN": "Microsoft JhengHei UI", "CN": "微軟正黑體 UI"
         },
@@ -35,6 +36,29 @@ const fontList = {
             }, {
                 "tag": "slng", "string": "Bopo, Grek, Hani, Hant, Hira, Kana, Latn, Hant-HK, Hans"
             }]
+        }
+    },
+    "MEIRYO": {
+        UI: {
+            "EN": "Meiryo UI", "CN": "Meiryo UI"
+        },
+        SANS: {
+            "EN": "Meiryo", "CN": "メイリオ"
+        },
+        "FILENAME": "meiryo",
+        "meta": {
+            "version": 1,
+            "flags": 0,
+            "entries": [
+                {
+                    "tag": "dlng",
+                    "string": "Hani, Hira, Hrkt, Jpan, Kana"
+                },
+                {
+                    "tag": "slng",
+                    "string": "Cyrl, Grek, Hani, Hira, Hrkt, Jpan, Kana, Latn"
+                }
+            ]
         }
     }
 }
@@ -193,14 +217,24 @@ const build = async (sansFontFile, uiFontFile) => {
     await runProcess(["otf2otc", "-o", yhTTC, `temp/${fontList["YH"]["FILENAME"]}${nameOfWeight(sansWeight)}.ttf`, `temp/${fontList["YH"]["FILENAME"]}ui${nameOfWeight(uiWeight)}.ttf`])
     console.log(`${yhTTC} built`)
     // 微软正黑
-    patchCFFObject(sansFont, "JH", SANS, sansWeight, nextSansReplaceName)
+    nextSansReplaceName = patchCFFObject(sansFont, "JH", SANS, sansWeight, nextSansReplaceName)
     await patchNameObject(sansFont, sansName, "JH", SANS, sansWeight)
     // 微软正黑UI
-    patchCFFObject(sansFont, "JH", UI, sansWeight, nextUiReplaceName)
+    nextUiReplaceName = patchCFFObject(sansFont, "JH", UI, sansWeight, nextUiReplaceName)
     await patchNameObject(uiFont, uiName, "JH", UI, uiWeight)
     const jhTTC = `out/${fontList["JH"]["FILENAME"]}${nameOfWeight(sansWeight)}.ttc`
     await runProcess(["otf2otc", "-o", jhTTC, `temp/${fontList["JH"]["FILENAME"]}${nameOfWeight(sansWeight)}.ttf`, `temp/${fontList["JH"]["FILENAME"]}ui${nameOfWeight(uiWeight)}.ttf`])
     console.log(`${jhTTC} built`)
+
+    // Meiryo
+    nextSansReplaceName = patchCFFObject(sansFont, "MEIRYO", SANS, sansWeight, nextSansReplaceName)
+    await patchNameObject(sansFont, sansName, "MEIRYO", SANS, sansWeight)
+    // MeiryoUI
+    nextUiReplaceName = patchCFFObject(uiFont, "MEIRYO", UI, uiWeight, nextUiReplaceName)
+    await patchNameObject(uiFont, uiName, "MEIRYO", UI, uiWeight)
+    const mrTTC = `out/${fontList["MEIRYO"]["FILENAME"]}${nameOfWeight(sansWeight)}.ttc`
+    await runProcess(["otf2otc", "-o", mrTTC, `temp/${fontList["MEIRYO"]["FILENAME"]}${nameOfWeight(sansWeight)}.ttf`, `temp/${fontList["MEIRYO"]["FILENAME"]}ui${nameOfWeight(uiWeight)}.ttf`])
+    console.log(`${mrTTC} built`)
 }
 
 const files = (await listDir("data")).sort()
