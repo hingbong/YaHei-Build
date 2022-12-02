@@ -86,6 +86,15 @@ export async function writeToGithubEnv(env: Env[]): Promise<void> {
     file.close()
 }
 
+export function writeToEnv(env: Env[]) {
+    env.forEach(e => {
+        Deno.env.set(e.key, e.value)
+    })
+}
+
+export function readEnv(key: string): string | undefined {
+    return Deno.env.get(key)
+}
 
 export interface Author {
     login: string;

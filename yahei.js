@@ -1,7 +1,16 @@
 const UI = "UI"
 const SANS = "SANS"
 
-import {runProcess, listDir, buildOtf, getFontObject, writeJson, needChangeNames} from "./utils.ts"
+import {
+    runProcess,
+    listDir,
+    buildOtf,
+    getFontObject,
+    writeJson,
+    needChangeNames,
+    writeToGithubEnv,
+    writeToEnv
+} from "./utils.ts"
 
 const fontList = {
     "YH": {
@@ -242,4 +251,9 @@ console.log(`prepare to build ${files}`)
 // Normal is same weight with Regular
 for (const file of files.filter(file => file.endsWith(".ttf") && !file.includes("HW") && !file.includes("Normal"))) {
     await build(file, file)
+    if (file.includes("Regular")) {
+        const regularPath = [{key: "SANS_REGULAR_FONT_PATH", value: file}]
+        await writeToGithubEnv(regularPath)
+        writeToEnv(regularPath)
+    }
 }

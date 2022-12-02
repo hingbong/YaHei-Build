@@ -6,7 +6,7 @@ import {
     AAJP_Serif,
     download,
     writeToGithubEnv,
-    GithubRelease
+    GithubRelease, readEnv
 } from "./utils.ts"
 
 const fontList = {
@@ -44,12 +44,15 @@ const fontList = {
                 }
             ]
         }
+    },
+    "msgothic": {
+        FILENAME: "msgothic"
     }
 }
 
 const patchCFFObject = (fontObject: any, fontName: "simsun" | "nsimsun") => {
     const CFFObject = fontObject["CFF_"]
-    if (!CFFObject) return
+    if (CFFObject) throw ("do not support postscript for now")
     const enName: string = fontList[fontName].name
     const enNameCompat = enName.replaceAll(" ", "")
     CFFObject["fontName"] = enName
@@ -115,7 +118,28 @@ await buildOtf(nsimsunFilePath, nsimsunJsonPath)
 console.log(`${nsimsunFilePath} built`)
 
 await runProcess(["otf2otc", "-o", "out/simsun.ttc", simsunFilePath, nsimsunFilePath])
-console.log(`out/simsun.ttc built`)
+
+
+// msgothic
+const fontFile = readEnv("SANS_REGULAR_FONT_PATH")!!
+const sansFont = await getFontObject(fontFile)
+console.log(`get ${fontFile} font object`)
+const msgothicA: any[] = JSON.parse(Deno.readTextFileSync("msgothic.json"))
+for (const index in msgothicA) {
+    sansFont["name"] = msgothicA[index]["name"]
+    sansFont["meta"] = fontList["nsimsun"]["meta"]
+    const tempJsonPath = `temp/msgothic${index}.json`
+    await writeJson(tempJsonPath, sansFont)
+    const tempFilePath = `temp/msgothic${index}.ttf`
+    await buildOtf(tempFilePath, tempJsonPath)
+    console.log(`${tempFilePath} built`)
+}
+const msgothicTTFs: string[] = msgothicA.map((_, index) =>
+    `temp/msgothic${index}.ttf`
+)
+await runProcess(["otf2otc", "-o", "out/msgothic.ttc", simsunFilePath, nsimsunFilePath].concat(msgothicTTFs))
+
+console.log(`out/msgothic.ttc built`)
 
 await writeToGithubEnv([{
     key: "SERIF_VERSION",
