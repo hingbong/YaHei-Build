@@ -32,10 +32,6 @@ jobs:
       run: |
         deno run --config ./deno.json --allow-all --v8-flags=--max-old-space-size=8192 simsun.ts
         ls out/*
-    - name: droid-sans-mono.ts
-      run: |
-        deno run --config ./deno.json --allow-all --v8-flags=--max-old-space-size=8192 droid-sans-mono.ts
-        ls out/*
     - name: Compress font
       run: |
         cd out
