@@ -85,7 +85,7 @@ const latest = releases.find(release => tagReg.test(release.tag_name))
 if (!latest) throw new Error("cannot get latest ttf")
 
 console.log(`latest: ${JSON.stringify(latest, null, 2)}`)
-const asset = latest.assets.find(asset => asset.name === "AdvocateAncientSerifTTFs_unhinted.7z")
+const asset = latest.assets.find(asset => asset.name === "AdvocateAncientSerifTTFs.7z")
 if (!asset) throw new Error("cannot get latest ttf asset")
 console.log(`Serif latest tag: ${latest.name}`)
 const serifVersion = latest.tag_name
