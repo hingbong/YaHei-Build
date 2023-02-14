@@ -51,7 +51,7 @@ export function writeJson(filePath: string, o: any) {
     Deno.writeTextFileSync(filePath, JSON.stringify(o))
 }
 
-import {readerFromStreamReader, copy} from "https://deno.land/std/streams/conversion.ts";
+import {readerFromStreamReader, copy} from "https://deno.land/std/streams/mod.ts";
 
 export async function download(url: string, destPath: string): Promise<void> {
     const res = await fetch(url);
