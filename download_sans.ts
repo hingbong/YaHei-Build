@@ -3,11 +3,10 @@ import {download, listDir, GithubRelease, runProcess, writeToGithubEnv} from "./
 const api = "https://api.github.com/repos/GuiWonder/SourceHanToClassic/releases"
 const releases: Array<GithubRelease> = (await (await fetch(api)).json()).sort((a: GithubRelease, b: GithubRelease) =>
     Date.parse(b.published_at) - Date.parse(a.published_at))
-console.log(`releases: ${releases.map(release => release.name).join("\n")}`)
+console.log(`releases: ${releases.map(release => release.tag_name?.trim()).join("\n")}`)
 
-const tagReg = RegExp("(.*-ttf)")
 
-const latest = releases.find(release => tagReg.test(release.tag_name))
+const latest = releases[0]
 if (!latest) throw new Error("cannot get latest ttf")
 
 console.log(`latest: ${JSON.stringify(latest, null, 2)}`)
