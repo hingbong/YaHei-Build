@@ -13,8 +13,7 @@ jobs:
       run: |
         echo "/github/home/.local/bin" >> $GITHUB_PATH
         echo "/github/home/.deno/bin" >> $GITHUB_PATH
-        pacman -Syu --noconfirm git fontforge curl p7zip jq python-pip unzip
-        pip3 install --user afdko
+        pacman -Syu --noconfirm git curl p7zip unzip
         curl -fsSL https://deno.land/install.sh | sh
         realpath ~/.deno/bin/deno
         ~/.deno/bin/deno help
