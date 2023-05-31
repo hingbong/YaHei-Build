@@ -246,6 +246,7 @@ const build = async (sansFontFile, uiFontFile) => {
     let nextUiReplaceName = patchCFFObject(uiFont, "YH", UI, uiWeight, "")
     await patchNameObject(uiFont, uiName, "YH", UI, uiWeight)
     const yhTTC = `out/${fontList["YH"]["FILENAME"]}${nameOfWeight(sansWeight)}.ttc`
+    console.log(`combine ttc ${yhTTC}`)
     await runProcess(["otf2otc", "-o", yhTTC, `temp/${fontList["YH"]["FILENAME"]}${nameOfWeight(sansWeight)}.ttf`, `temp/${fontList["YH"]["FILENAME"]}ui${nameOfWeight(uiWeight)}.ttf`])
     console.log(`${yhTTC} built`)
     // 微软正黑
@@ -282,6 +283,11 @@ const build = async (sansFontFile, uiFontFile) => {
 const files = (await listDir("data")).sort()
 console.log(`prepare to build ${files}`)
 // Normal is same weight with Regular
+try {
+    Deno.mkdirSync("out")
+} catch (e) {
+    console.error(e)
+}
 for (const file of files.filter(file => file.endsWith(".ttf") && !file.includes("HW") && !file.includes("Normal"))) {
     await build(file, file)
     if (file.includes("Regular")) {

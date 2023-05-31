@@ -10,7 +10,7 @@ const latest = releases[0]
 if (!latest) throw new Error("cannot get latest ttf")
 
 console.log(`latest: ${JSON.stringify(latest, null, 2)}`)
-const asset = latest.assets.find(asset => asset.name === "AdvocateAncientSansTTFs.7z")
+const asset = latest.assets.find(asset => asset.name === "Testing_AdvocateAncientSansTTFs_hinted.7z")
 if (!asset) throw new Error("cannot get latest ttf asset")
 
 await Deno.mkdir("temp")
@@ -26,10 +26,14 @@ await writeToGithubEnv([
 ])
 Deno.mkdirSync("source")
 
-await runProcess(["7z", "x", "-osource", "-x!AdvocateAncientSansJP/LICENSE.txt", `temp/${asset.name}`])
+await runProcess(["7z", "x", "-osource", `temp/${asset.name}`])
 
 const fonts = Deno.readDirSync(`source/AdvocateAncientSansJP`)
 await Deno.mkdir("data")
 for (const font of fonts) {
-    Deno.copyFileSync(`source/AdvocateAncientSansJP/${font.name}`, `data/${font.name}`)
+    const src = `source/AdvocateAncientSansJP/${font.name}`
+    if (src.includes("HW") || src.includes(".txt")) continue
+    const dest = `data/${font.name}`
+    console.log(`copy ${src} to ${dest}`)
+    Deno.copyFileSync(src, dest)
 }
