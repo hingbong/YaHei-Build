@@ -13,24 +13,24 @@ jobs:
       run: |
         echo "/github/home/.local/bin" >> $GITHUB_PATH
         echo "/github/home/.deno/bin" >> $GITHUB_PATH
-        pacman -Syu --noconfirm git curl p7zip unzip
+        pacman -Syu --noconfirm git curl p7zip unzip tree python
         curl -fsSL https://deno.land/install.sh | sh
         realpath ~/.deno/bin/deno
         ~/.deno/bin/deno help
     - uses: actions/checkout@v3
-    - name: download_sans
-      run: deno run --config ./deno.json --allow-all --v8-flags=--max-old-space-size=8192 download_sans.ts
+    - name: Download Tools
+      run: deno run --allow-all --v8-flags=--max-old-space-size=8192 download_tools.ts
+    - name: Download fonts
+      run: deno run --allow-all --v8-flags=--max-old-space-size=8192 download_fonts.ts
     - name: prepare
       run: |
+        pwd
+        tree
         mkdir out
-    - name: yahei.js
+    - name: Process
       run: |
-        deno run --config ./deno.json --allow-all --v8-flags=--max-old-space-size=8192 yahei.js
-        ls out/*
-    - name: simsun.ts
-      run: |
-        deno run --config ./deno.json --allow-all --v8-flags=--max-old-space-size=8192 simsun.ts
-        ls out/*
+        deno run --allow-all --v8-flags=--max-old-space-size=8192 process.ts
+        ls out
     - name: Compress font
       run: |
         cd out

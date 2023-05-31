@@ -1,4 +1,7 @@
 export async function runProcess(command: string[], log: boolean = true): Promise<void> {
+    if (log) {
+        console.log(`command: ${command.join(" ")}`)
+    }
     const p = Deno.run({
         cmd: command,
         stdout: 'piped',
@@ -21,7 +24,7 @@ export async function listDir(currentPath: string): Promise<string[]> {
 
     const names: string[] = []
 
-    for await (const dirEntry of Deno.readDir(currentPath)) {
+    for (const dirEntry of Deno.readDirSync(currentPath)) {
 
         const entryPath = `${currentPath}/${dirEntry.name}`
         if (dirEntry.isFile) {
@@ -29,26 +32,6 @@ export async function listDir(currentPath: string): Promise<string[]> {
         }
     }
     return names
-}
-
-export const otfccdump = "bin/otfccdump"
-export const otfccbuild = "bin/otfccbuild"
-export const AAJP_SANS = "AdvocateAncientJPSans"
-export const AAJP_Serif = "AdvocateAncientJPSerif"
-
-export async function buildOtf(outputFileName: string, jsonFile: string): Promise<void> {
-    await runProcess([otfccbuild, "--keep-modified-time", "--keep-average-char-width", "-O3", "-q", "-o", outputFileName, jsonFile])
-}
-
-export const getFontObject = async (filePath: string) => {
-    await runProcess([otfccdump, "--no-bom", "-o", "temp/temp.json", filePath])
-    return JSON.parse(Deno.readTextFileSync("temp/temp.json"))
-}
-
-export const needChangeNames = [1, 3, 4, 6, 16]
-
-export function writeJson(filePath: string, o: any) {
-    Deno.writeTextFileSync(filePath, JSON.stringify(o))
 }
 
 import {readerFromStreamReader, copy} from "https://deno.land/std/streams/mod.ts";
@@ -181,3 +164,11 @@ export interface GithubRelease {
     body: string;
     reactions: Reactions;
 }
+import {
+    decompress
+} from "https://deno.land/x/zip/mod.ts";
+export async function unzip(zipFile: string, dest: string): Promise<string | false> {
+    return decompress(zipFile, dest)
+}
+
+export const toWinFontsToolPath =`tools/toWinFonts/toWinFonts-main/main/winfont.py`
