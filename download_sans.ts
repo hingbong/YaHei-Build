@@ -26,7 +26,7 @@ await writeToGithubEnv([
 ])
 Deno.mkdirSync("source")
 
-await runProcess(["7z", "x", "-osource", "-x!*.txt", `temp/${asset.name}`])
+await runProcess(["7z", "x", "-osource", "-x!AdvocateAncientSansJP/LICENSE.txt", `temp/${asset.name}`])
 
 const fonts = Deno.readDirSync(`source/AdvocateAncientSansJP`)
 await Deno.mkdir("data")
