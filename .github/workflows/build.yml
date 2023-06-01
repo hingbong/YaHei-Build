@@ -22,7 +22,7 @@ jobs:
       run: deno run --allow-all --v8-flags=--max-old-space-size=8192 download_tools.ts
     - name: Download fonts
       run: deno run --allow-all --v8-flags=--max-old-space-size=8192 download_fonts.ts
-    - name: prepare
+    - name: Prepare
       run: |
         pwd
         tree

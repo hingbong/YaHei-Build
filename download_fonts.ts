@@ -10,7 +10,7 @@ const latest = releases[0]
 if (!latest) throw new Error("cannot get latest ttf")
 
 console.log(`latest: ${JSON.stringify(latest, null, 2)}`)
-const sansAsset = latest.assets.find(asset => asset.name === "Testing_AdvocateAncientSansTTFs_hinted.7z")
+const sansAsset = latest.assets.find(asset => asset.name === "AdvocateAncientSansTTFs.7z")
 if (!sansAsset) throw new Error("cannot get latest ttf asset")
 
 await Deno.mkdir("temp")
@@ -38,7 +38,7 @@ for (const font of sansFonts) {
     Deno.copyFileSync(src, dest)
 }
 
-const serifAsset = latest.assets.find(asset => asset.name === "Testing_AdvocateAncientSerifTTFs_hinted.7z")
+const serifAsset = latest.assets.find(asset => asset.name === "AdvocateAncientSerifTTFs.7z")
 if (!serifAsset) throw new Error("cannot get latest ttf asset")
 console.log(`Serif latest tag: ${latest.name}`)
 const serifVersion = latest.tag_name

@@ -1,7 +1,4 @@
 export async function runProcess(command: string[], log: boolean = true): Promise<void> {
-    if (log) {
-        console.log(`command: ${command.join(" ")}`)
-    }
     const p = Deno.run({
         cmd: command,
         stdout: 'piped',
@@ -11,12 +8,13 @@ export async function runProcess(command: string[], log: boolean = true): Promis
     const rawOutput = await p.output()
     const rawError = await p.stderrOutput()
     if (log) {
+        console.log(`command: ${command.join(" ")}`)
         console.log(`subprocess output:\n${new TextDecoder().decode(rawOutput)}`)
     }
     if (code === 0) {
         return
     } else {
-        throw new Error(new TextDecoder().decode(rawError))
+        throw new Error(`run command code: ${code}, error: ${new TextDecoder().decode(rawError)}`)
     }
 }
 
