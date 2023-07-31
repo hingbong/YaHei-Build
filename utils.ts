@@ -72,6 +72,31 @@ export function readEnv(key: string): string | undefined {
     return (value === "undefined" || !value) ? undefined : value
 }
 
+export const downloadFromGithubLatestRelease = async (repo: string, fileName: string) => {
+    const api = `https://api.github.com/repos/${repo}/releases`
+    const releases: Array<GithubRelease> = (await (await fetch(api)).json()).sort((a: GithubRelease, b: GithubRelease) =>
+        Date.parse(b.published_at) - Date.parse(a.published_at))
+    console.log(`releases: ${releases.map(release => release.tag_name?.trim()).join("\n")}`)
+
+
+    const latest = releases[0]
+    if (!latest) throw new Error("cannot get latest release")
+
+    console.log(`latest: ${JSON.stringify(latest, null, 2)}`)
+    const asset = latest.assets.find(asset => asset.name === fileName)
+    if (!asset) throw new Error("cannot get latest ttf asset")
+
+    await download(asset.browser_download_url, `temp/${asset.name}`)
+
+    const files = await listDir("temp")
+
+    console.log(`downloaded files: ${files}`)
+    return {
+        tag_name: latest.tag_name,
+        file_name: asset.name
+    }
+};
+
 export interface Author {
     login: string;
     id: number;
