@@ -1,8 +1,8 @@
 import {listDir, runProcess, toWinFontsToolPath} from "./utils.ts";
 
-const sansTg = ["msyh", "msjh", "simhei", "msgothic", "meiryo"]
+const sansTg = ["msyh", "msjh", "simhei", "msgothic", "meiryo", "yugoth", "malgun"]
 
-const serifTg = ["simsun", "msmincho", "mingliu"]
+const serifTg = ["simsun", "msmincho", "mingliu", "yumin"]
 
 const cwd = Deno.cwd()
 const sansFonts = await listDir("sans")

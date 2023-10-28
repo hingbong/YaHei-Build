@@ -31,10 +31,14 @@ await Deno.mkdir("temp")
     await runProcess(["7z", "x", "-osource", `temp/${file_name}`])
 
     await Deno.mkdir("serif")
-    const src = `source/AdvocateAncientSerifJP/AdvocateAncientSerifJP-Regular.ttf`
-    const dest = `serif/AdvocateAncientSerifJP-Regular.ttf`
-    console.log(`copy ${src} to ${dest}`)
-    Deno.copyFileSync(src, dest)
+    const weights = ["Bold", "Regular", "SemiBold"]
+    for (const w of weights) {
+            const src = `source/AdvocateAncientSerifJP/AdvocateAncientSerifJP-${w}.ttf`
+            const dest = `serif/AdvocateAncientSerifJP-${w}.ttf`
+            console.log(`copy ${src} to ${dest}`)
+            Deno.copyFileSync(src, dest)
+    }
+
 
     await writeToGithubEnv([{
         key: "SERIF_VERSION",
