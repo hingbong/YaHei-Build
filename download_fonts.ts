@@ -3,7 +3,7 @@ import {downloadFromGithubLatestRelease, runProcess, writeToGithubEnv} from "./u
 await Deno.mkdir("temp")
 {
 
-    const {tag_name, file_name} = await downloadFromGithubLatestRelease("hingbong/SourceHanToClassic",
+    const {tag_name, file_name} = await downloadFromGithubLatestRelease("GuiWonder/SourceHanToClassic",
         "AdvocateAncientSansTTFs.7z")
 
     await writeToGithubEnv([
@@ -26,7 +26,7 @@ await Deno.mkdir("temp")
 }
 
 {
-    const {tag_name, file_name}  = await downloadFromGithubLatestRelease("hingbong/SourceHanToClassic",
+    const {tag_name, file_name}  = await downloadFromGithubLatestRelease("GuiWonder/SourceHanToClassic",
         "AdvocateAncientSerifTTFs.7z")
     await runProcess(["7z", "x", "-osource", `temp/${file_name}`])
 
