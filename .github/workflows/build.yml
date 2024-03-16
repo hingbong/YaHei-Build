@@ -34,7 +34,7 @@ jobs:
         cd out
         7z a ../YaHei.zip *
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: YaHei
         path: YaHei.zip
