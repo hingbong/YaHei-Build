@@ -32,21 +32,17 @@ export async function listDir(currentPath: string): Promise<string[]> {
     return names
 }
 
-import {readerFromStreamReader, copy} from "https://deno.land/std/streams/mod.ts";
-
 export async function download(url: string, destPath: string): Promise<void> {
     const res = await fetch(url);
     if (res.status !== 200) {
         throw new Error(`response status was ${res.status}, this is not handled.`);
     }
 
-    const file = await Deno.open(destPath, {create: true, write: true, read: true})
+    using file = Deno.openSync(destPath, {create: true, write: true, read: true})
 
     if (res?.body) {
-        const reader = readerFromStreamReader(res.body.getReader());
-        await copy(reader, file);
+        await res.body.pipeTo(file.writable)
     }
-    file.close();
 }
 
 type Env = {
@@ -84,8 +80,12 @@ export const downloadFromGithubLatestRelease = async (repo: string, fileName: st
 
     console.log(`latest: ${JSON.stringify(latest, null, 2)}`)
     const asset = latest.assets.find(asset => asset.name === fileName)
-    if (!asset) throw new Error("cannot get latest ttf asset")
+    if (!asset) {
+        console.log("can't find asset")
+        throw new Error("cannot get latest ttf asset")
+    }
 
+    console.log(`asset is ${JSON.stringify(asset)}`)
     await download(asset.browser_download_url, `temp/${asset.name}`)
 
     const files = await listDir("temp")

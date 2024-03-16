@@ -15,7 +15,7 @@ jobs:
         curl -fsSL https://deno.land/install.sh | sh
         realpath ~/.deno/bin/deno
         ~/.deno/bin/deno help
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Download Tools
       run: deno run --allow-all --v8-flags=--max-old-space-size=8192 download_tools.ts
     - name: Download fonts
