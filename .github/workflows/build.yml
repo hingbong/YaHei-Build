@@ -35,17 +35,17 @@ jobs:
     - name: Compress font
       run: |
         cd out
-        7z a ../YaHei.zip *
+        7z a ../YaHei.7z *
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: YaHei
-        path: YaHei.zip
+        path: YaHei.7z
     - name: Upload release
       uses: ncipollo/release-action@v1
       with:
         token: "${{ secrets.GITHUB_TOKEN }}"
         body: ""
         tag: "YAHEI-${{env.SANS_VERSION}}-UI-${{env.SANS_UI_VERSION}}-S-${{env.SERIF_VERSION}}"
-        artifacts: YaHei.zip
+        artifacts: YaHei.7z
         allowUpdates: true
