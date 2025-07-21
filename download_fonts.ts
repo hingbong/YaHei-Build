@@ -4,7 +4,7 @@ await Deno.mkdir("temp")
 {
 
     const {tag_name, file_name} = await downloadFromGithubLatestRelease("be5invis/Sarasa-Gothic",
-        "SarasaGothicCL-TTF-(?!Unhinted).*\\.7z")
+        "SarasaUiCL-TTF-Unhinted.*\\.7z")
 
     await writeToGithubEnv([
         {key: "SANS_VERSION", value: `Sarasa-${tag_name}`},
