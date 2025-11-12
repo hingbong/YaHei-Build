@@ -49,3 +49,9 @@ jobs:
         tag: "YAHEI-${{env.SANS_VERSION}}-UI-${{env.SANS_UI_VERSION}}-S-${{env.SERIF_VERSION}}"
         artifacts: YaHei.7z
         allowUpdates: true
+    - name: Delete artifact
+      if: success()
+      uses: geekyeggo/delete-artifact@v5
+      with:
+        name: YaHei
+        token: "${{ secrets.GITHUB_TOKEN }}"
